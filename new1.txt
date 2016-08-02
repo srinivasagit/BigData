@@ -1,0 +1,154 @@
+
+ ./bin/spark-submit --class org.apache.spark.examples.SparkPi \
+    --master yarn \
+    --deploy-mode cluster \
+    --driver-memory 4g \
+    --executor-memory 2g \
+    --executor-cores 1 \
+    --queue default \
+    lib/spark-examples*.jar \
+    10
+ ./bin/spark-submit  \
+    --master yarn \
+    --deploy-mode cluster \
+    --driver-memory 4g \
+    --executor-memory 2g \
+    --executor-cores 1 \
+    --queue default \
+    spark_py_test/spark_isprime.py 
+    
+/bin/spark-submit      --master yarn    \ 
+--deploy-mode cluster     --driver-memory 4g     --executor-memory 2g     --executor-cores 1     --queue default     spark_py_test/spark_isprime.py
+    
+@pyspark shell
+    myRDD = sc.parallelize(range(6), 3)
+
+textFile = sc.textFile("README.md")
+
+textFile = sc.textFile("file:///home/srinivasa/Desktop/new1.txt")
+textFile = sc.textFile("hdfs://centos:9000/user/srinivasa/in/LICENSE")
+textFile.count()
+
+>>> words = sc.textFile("/usr/share/dict/words")
+>>> words.filter(lambda w: w.startswith("spar")).take(5)
+
+yum -y remove java*
+
+
+./bin/spark-submit examples/src/main/python/pi.py
+
+
+def _load_from_socket(port, serializer):
+    sock = None
+    # Support for both IPv4 and IPv6.
+    # On most of IPv6-ready systems, IPv6 will take precedence.
+    sock = socket.socket()
+    sock.settimeout(3)
+    try:
+        sock.connect(("localhost", port))
+        rf = sock.makefile("rb", 65536)
+        for item in serializer.load_stream(rf):
+            yield item
+    finally:
+        sock.close()
+/usr/lib/spark-1.6.1/python/lib/pyspark.zip
+----------------------
+import sys
+from random import random
+from operator import add
+
+from pyspark import SparkContext
+
+
+if __name__ == "__main__":
+    """
+        Usage: pi [partitions]
+    """
+    print("python version - {}".format(sys.version))
+    sc = SparkContext(appName="PythonPi")
+    partitions = int(sys.argv[1]) if len(sys.argv) > 1 else 2
+    n = 100000 * partitions
+
+    def f(_):
+        x = random() * 2 - 1
+        y = random() * 2 - 1
+        return 1 if x ** 2 + y ** 2 < 1 else 0
+
+    count = sc.parallelize(range(1, n + 1), partitions).map(f).reduce(add)
+    print("Pi is roughly %f" % (4.0 * count / n))
+
+    sc.stop()
+---------------------------------
+Successful:
+ ./bin/spark-submit  --master yarn --deploy-mode cluster --queue default spark_py_test/spark_isprime.py
+
+----------
+export PYTHONPATH=/usr/lib/spark-1.6.1/python:/usr/lib/spark-1.6.1/python/lib/py4j-0.9-src.zip:
+-----------------
+PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:/opt/jdk1.7.0_80/bin:/opt/jdk1.7.0_80/jre/bin:/home/srinivasa/hadoop/hadoop/sbin:/home/srinivasa/hadoop/hadoop/bin:/home/srinivasa/hive/bin:/home/srinivasa/flume/bin:/home/srinivasa/sqoop-1.4.6/bin:/home/srinivasa/.local/bin:/home/srinivasa/bin:/opt/jdk1.7.0_80/bin:/opt/jdk1.7.0_80/jre/bin:/home/srinivasa/hadoop/hadoop/sbin:/home/srinivasa/hadoop/hadoop/bin:/home/srinivasa/hive/bin:/home/srinivasa/flume/bin:/home/srinivasa/sqoop-1.4.6/bin
+
+------------------- reset mysql password
+update user set Password=PASSWORD('root') where user='root';
+flush privileges;
+
+
+url="jdbc:mysql://localhost:3306/fortune?user=hadoop;password=hadoop"
+driver="com.mysql.jdbc.Driver"
+df = sqlContext \
+  .read \
+  .format("jdbc") \
+  .option("url", url) \
+  .option("driver",driver) \
+  .option("dbtable", "country") \
+  .load()
+  
+export SPARK_CLASSPATH=$SPARK_HOME/mysql-connector-java-5.1.30/mysql-connector-java-5.1.30-bin.jar:$SPARK_CLASSPATH
+  
+df = sqlContext.read.format("jdbc").options(url="jdbc:mysql://localhost:3306/fortune?user=hadoop&password=hadoop",driver="com.mysql.jdbc.Driver",dbtable="country").load()
+
+df = sqlContext.read.jdbc("jdbc:mysql://localhost:3306/fortune","country",user=hadoop,password=hadoop",driver="com.mysql.jdbc.Driver")
+
+
+
+-------------------------
+sqoop import --connect jdbc:mysql://localhost:3306/fortune --username=hadoop --password=hadoop --table=actor
+
+sqoop import-all-tables \
+--connect jdbc:mysql://localhost:3306/fortune \
+--username=hadoop --password=hadoop \
+-m 1 \
+--hive-import \
+--create-hive-table \
+--hive-database sqoop_import \
+--compress --compression-codec org.apache.hadoop.io.compress.SnappyCodec 
+
+
+sqoop import -connect jdbc:mysql://localhost:3306/fortune \
+--username=hadoop \
+--password=hadoop \
+--table=actor_info \
+--split-by actor_id \
+-m 4 \
+--columns actor_id,last_name \
+--boundary-query "select 50,150 from actor_info" \
+--hive-import \
+--create-hive-table \
+--hive-table actor_info_split \
+--hive-database sqoop_import \
+--warehouse-dir /user/hive/warehouse
+
+sqoop import -connect jdbc:mysql://localhost:3306/fortune \
+--username=hadoop \
+--password=hadoop \
+--table=actor_info \
+--split-by actor_id \
+-m 4 \
+--columns actor_id,last_name \
+--boundary-query "select 151,180 from actor_info" \
+--append \
+--warehouse-dir /user/hive/warehouse/sqoop_import.db/actor_info_split
+--------------------------------
+sqoop export -connect jdbc:mysql://localhost:3306/fortune --username=hadoop --password=hadoop --table=actor_export --export-dir=/user/hive/warehouse/sqoop_import.db/actor_export --num-mappers=2 --fields-terminated-by '\001' --batch --update-key actor_id --update-mode=allowinsert
+
+
+sqoop import -connect jdbc:mysql://localhost:3306/fortune --username=hadoop --password=hadoop --query="select a.actor_id,a.first_name,b.film_id,c.title from actor a join film_actor b join film c on (a.actor_id=b.actor_id and b.film_id=c.film_id) where \$CONDITIONS" --target-dir=/user/srinivasa/join_import --split-by=a.actor_id
