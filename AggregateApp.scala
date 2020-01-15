@@ -3,7 +3,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
 object AggregateApp {
-    def main (args: Array[String]) {
+    def main (args: Array[String]) {  
      val conf = new SparkConf().setAppName("Aggregate Application")
      val sc = new SparkContext(conf)
      val OrdersItems = sc.textFile("/user/cloudera/sqoop_import/order_items")
